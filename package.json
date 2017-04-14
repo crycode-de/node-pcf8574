@@ -1,0 +1,39 @@
+{
+  "name": "pcf8574",
+  "version": "1.0.0",
+  "description": "Communication with a PCF8574/PCF8574A I2C port expander IC.",
+  "keywords": [
+    "pcf8574",
+    "pcf8574a",
+    "i2c",
+    "portexpander"
+  ],
+  "main": "dist/pcf8574.js",
+  "typings": "typings/index.d.ts",
+  "scripts": {
+    "prepublish": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Peter Müller <peter@crycode.de> (https://crycode.de)",
+  "license": "GPL-2.0",
+  "homepage": "https://git.cryhost.de/crycode/node-pcf8574",
+  "repository": {
+    "type": "git",
+    "url": "https://git.cryhost.de/crycode/node-pcf8574.git"
+  },
+  "bugs": {
+    "url": "https://git.cryhost.de/crycode/node-pcf8574/issues"
+  },
+  "devDependencies": {
+    "@types/bluebird": "^3.5.2",
+    "@types/i2c-bus": "^1.0.9",
+    "@types/node": "^4.2.4",
+    "@types/onoff": "0.0.27",
+    "typescript": "^2.2.2"
+  },
+  "dependencies": {
+    "bluebird": "^3.5.0",
+    "i2c-bus": "^1.2.1",
+    "onoff": "^1.1.2"
+  }
+}
