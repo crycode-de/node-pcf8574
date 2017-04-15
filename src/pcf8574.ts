@@ -53,12 +53,14 @@ export class PCF8574 extends EventEmitter {
 
   /**
    * Constructor for a PCF8574/PCF8574A IC.
+   * If you use this IC with one or more input pins, you have to call ...
+   *  a) enableInterrupt(gpioPin) to detect interrupts from the IC using a GPIO pin, or
+   *  b) doPoll() frequently enough to detect input changes with manually polling.
    * @param  {I2cBus}         i2cBus       Instance of an opened i2c-bus.
    * @param  {number}         address      The address of the PCF8574/PCF8574A IC.
    * @param  {boolean|number} initialState The initial state of the pins of this IC. You can set a bitmask to define each pin seprately, or use true/false for all pins at once.
-   * @param  {number}         gpioPin      (optional) BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC. If not set you have to call doPoll() frequently enough to detect input changes.
    */
-  constructor(i2cBus:I2cBus, address:number, initialState:boolean|number, gpioPin:number){
+  constructor(i2cBus:I2cBus, address:number, initialState:boolean|number){
     super();
 
     this._i2cBus = i2cBus;
@@ -81,16 +83,32 @@ export class PCF8574 extends EventEmitter {
     // save the inital state as current sate and write it to the IC
     this._currentState = initialState;
     this._i2cBus.sendByteSync(this._address, this._currentState);
+  }
 
-    // setup the GPIO if set
-    if(typeof(gpioPin) === 'number'){
-      // init the GPIO as input with falling edge,
-      // because the PCF8574/PCF8574A will lower the interrupt line on changes
-      this._gpio = new Gpio(gpioPin, 'in', 'falling');
-      this._gpio.watch(()=>{
-        // poll the current state and ignore any rejected promise
-        this._poll().catch(()=>{ });
-      });
+  /**
+   * Enable the interrupt detection on the specified GPIO pin.
+   * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC.
+   */
+  public enableInterrupt(gpioPin:number):void{
+    // init the GPIO as input with falling edge,
+    // because the PCF8574/PCF8574A will lower the interrupt line on changes
+    this._gpio = new Gpio(gpioPin, 'in', 'falling');
+    this._gpio.watch(()=>{
+      // poll the current state and ignore any rejected promise
+      this._poll().catch(()=>{ });
+    });
+  }
+
+  /**
+   * Disable the interrupt detection.
+   * This will unexport the interrupt GPIO, if used.
+   */
+  public disableInterrupt():void{
+    // release the used GPIO
+    if(this._gpio !== null){
+      this._gpio.unwatchAll();
+      this._gpio.unexport();
+      this._gpio = null;
     }
   }
 
@@ -317,18 +335,5 @@ export class PCF8574 extends EventEmitter {
       return false;
     }
     return ((this._currentState>>pin) % 2 !== 0)
-  }
-
-  /**
-   * Can be called to clean up.
-   * This will unexport the interrupt GPIO, if used.
-   */
-  public destroy():void{
-    // release the used GPIO
-    if(this._gpio !== null){
-      this._gpio.unwatchAll();
-      this._gpio.unexport();
-      this._gpio = null;
-    }
   }
 }

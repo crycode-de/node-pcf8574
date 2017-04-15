@@ -13,8 +13,8 @@ declare module 'pcf8574' {
   import {I2cBus} from 'i2c-bus';
 
   /**
-  * The RadioHeadSerial Class.
-  */
+   * Class for handling a PCF8574/PCF8574A IC.
+   */
   export class PCF8574 extends EventEmitter {
 
     /** Constant for undefined pin direction (unused pin). */
@@ -28,12 +28,26 @@ declare module 'pcf8574' {
 
     /**
      * Constructor for a PCF8574/PCF8574A IC.
+     * If you use this IC with one or more input pins, you have to call ...
+     *  a) enableInterrupt(gpioPin) to detect interrupts from the IC using a GPIO pin, or
+     *  b) doPoll() frequently enough to detect input changes with manually polling.
      * @param  {I2cBus}         i2cBus       Instance of an opened i2c-bus.
      * @param  {number}         address      The address of the PCF8574/PCF8574A IC.
      * @param  {boolean|number} initialState The initial state of the pins of this IC. You can set a bitmask to define each pin seprately, or use true/false for all pins at once.
-     * @param  {number}         gpioPin      (optional) BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC. If not set you have to call doPoll() frequently enough to detect input changes.
      */
-    constructor(i2cBus:I2cBus, address:number, initialState:boolean|number, gpioPin:number);
+    constructor(i2cBus:I2cBus, address:number, initialState:boolean|number);
+
+    /**
+     * Enable the interrupt detection on the specified GPIO pin.
+     * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC.
+     */
+    public enableInterrupt(gpioPin:number):void;
+
+    /**
+     * Disable the interrupt detection.
+     * This will unexport the interrupt GPIO, if used.
+     */
+    public disableInterrupt():void;
 
     /**
      * Manually poll changed inputs from the PCF8574/PCF8574A IC.
@@ -87,11 +101,5 @@ declare module 'pcf8574' {
      * @return {boolean}     The current value.
      */
     public getPinValue(pin:number):boolean;
-
-    /**
-     * Can be called to clean up.
-     * This will unexport the interrupt GPIO, if used.
-     */
-    public destroy():void;
   }
 }
