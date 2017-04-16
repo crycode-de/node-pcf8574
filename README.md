@@ -24,16 +24,14 @@ To use the interrupt detection you need a Raspberry Pi or a similar board.
 Note that you need to construct the [i2c-bus](https://npmjs.org/package/i2c-bus) object
 and pass it in to the module along with the I2C address of the PCF8574/PCF8574A.
 
-The example blow can be found in the examples directory of this package together with a TypeScript example.
-
-If you want to use ES6 style imports you can use
-```js
-import {PCF8574} from 'pcf8574';
-```
+The example blow can be found in the [examples directory](https://git.cryhost.de/crycode/node-pcf8574/tree/master/examples) of this package together with a TypeScript example.
 
 ```js
 // Require the pcf8574 module
 var PCF8574 = require('pcf8574').PCF8574;
+
+// Or use ES6 style imports
+// import {PCF8574} from 'pcf8574';
 
 // Require the i2c-bus module and open the bus
 // This is only needed to use interrupts for input changed detection
@@ -112,7 +110,7 @@ process.on('SIGINT', function(){
 The API uses __Events__ for detected input changes and __Promises__ for all asyncronous actions.
 
 Input changes can be detected in two ways:
-* Using a GPIO to observe the interrupt signal from the PCF8574/PCF8574A IC. **Recommended on Raspberry Pi or similar.**
+* Using a GPIO to observe the interrupt signal from the PCF8574/PCF8574A IC. *Recommended on Raspberry Pi or similar.*
 * Call `doPoll()` manually frequently enough to actively read the current states. This leads to a higher load on the I2C-Bus.
 
 If a pin is defined as an input and a changed state is detected, an `input` Event will be emitted with an object containing the `pin` number and the new `value` of this pin.
@@ -130,18 +128,18 @@ Constructor for a new PCF8574/PCF8574A instance.
 
 * `i2cBus` - Instance of an opened i2c-bus.
 * `address` - The address of the PCF8574/PCF8574A IC.
-* `initialState` - The initial state of the pins of this IC. You can set a bitmask (e.g. __0b00101010__) to define each pin seprately, or use true/false for all pins at once.
+* `initialState` - The initial state of the pins of this IC. You can set a bitmask (e.g. *0b00101010*) to define each pin seprately, or use true/false for all pins at once.
 
 Note that you need to construct the [i2c-bus](https://npmjs.org/package/i2c-bus) object
 and pass it in to the module.
 
-If you use this IC with one or more input pins, you have to call ...
+If you use this IC with one or more input pins, you have to call
 * `enableInterrupt(gpioPin)` to detect interrupts from the IC using a GPIO pin, or
 * `doPoll()` frequently enough to detect input changes with manually polling.
 
 ### enableInterrupt(gpioPin)
 ```ts
-enableInterrupt(gpioPin:number):void;
+enableInterrupt(gpioPin:PCF8574.PinNumber):void;
 ```
 Enable the interrupt detection on the specified GPIO pin.
 
@@ -169,7 +167,7 @@ If you poll again before the last poll was completed, the promise will be reject
 
 ### outputPin(pin, inverted, initialValue)
 ```ts
-outputPin(pin:number, inverted:boolean, initialValue?:boolean):Promise<{}>;
+outputPin(pin:PCF8574.PinNumber, inverted:boolean, initialValue?:boolean):Promise<{}>;
 ```
 Define a pin as an output.
 This marks the pin to be used as an output pin.
@@ -182,7 +180,7 @@ Returns a Promise which will be resolved when the pin is ready.
 
 ### inputPin(pin, inverted)
 ```ts
-inputPin(pin:number, inverted:boolean):Promise<{}>;
+inputPin(pin:PCF8574.PinNumber, inverted:boolean):Promise<{}>;
 ```
 Define a pin as an input.
 This marks the pin for input processing and activates the high level on this pin.
@@ -196,7 +194,7 @@ Note that an input is always set to high (pullup) internally.
 
 ### setPin(pin, value)
 ```ts
-setPin(pin:number, value?:boolean):Promise<{}>;
+setPin(pin:PCF8574.PinNumber, value?:boolean):Promise<{}>;
 ```
 Set the value of an output pin.
 If no value is given, the pin will be toggled.
@@ -218,7 +216,7 @@ Returns a Promise which will be resolved when the new values are written to the 
 
 ### getPinValue(pin)
 ```ts
-getPinValue(pin:number):boolean;
+getPinValue(pin:PCF8574.PinNumber):boolean;
 ```
 Returns the current value of a pin.
 This returns the last saved value, not the value currently returned by the PCF8574/PCF9574A IC.
