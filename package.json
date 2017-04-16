@@ -1,12 +1,13 @@
 {
   "name": "pcf8574",
   "version": "1.0.0",
-  "description": "Communication with a PCF8574/PCF8574A I2C port expander IC.",
+  "description": "Control each pin of a PCF8574/PCF8574A I2C port expander IC.",
   "keywords": [
     "pcf8574",
     "pcf8574a",
     "i2c",
-    "portexpander"
+    "portexpander",
+    "gpio"
   ],
   "main": "dist/pcf8574.js",
   "typings": "typings/index.d.ts",

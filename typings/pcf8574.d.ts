@@ -3,9 +3,42 @@
  *
  * Copyright (c) 2017 Peter Müller <peter@crycode.de> (https://crycode.de)
  *
- * Node.js module for communication with a PCF8574/PCF8574A I2C port expander IC.
+ * Node.js module for controlling each pin of a PCF8574/PCF8574A I2C port expander IC.
  */
 
+/**
+ * Namespace for types for PCF8574
+ */
+declare namespace PCF8574 {
+
+  /**
+   * A pin number from 0 to 7
+   * @type {number}
+   */
+  type PinNumber = 0|1|2|3|4|5|6|7;
+
+  /**
+   * Data of an 'input' event
+   * @type {Object}
+   */
+  type InputData = {
+    /**
+     * Nnumber of the pin which triggerd the event
+     * @type {PinNumber}
+     */
+    pin: PinNumber;
+
+    /**
+     * New value of the pin
+     * @type {boolean}
+     */
+    value: boolean;
+  }
+}
+
+/**
+ * The pcf8574 module
+ */
 declare module 'pcf8574' {
 
   import {EventEmitter} from 'events';
@@ -27,7 +60,7 @@ declare module 'pcf8574' {
     public static readonly DIR_OUT;
 
     /**
-     * Constructor for a PCF8574/PCF8574A IC.
+     * Constructor for a new PCF8574/PCF8574A instance.
      * If you use this IC with one or more input pins, you have to call ...
      *  a) enableInterrupt(gpioPin) to detect interrupts from the IC using a GPIO pin, or
      *  b) doPoll() frequently enough to detect input changes with manually polling.
@@ -61,45 +94,45 @@ declare module 'pcf8574' {
     /**
      * Define a pin as an output.
      * This marks the pin to be used as an output pin.
-     * @param  {number}  pin          The pin.
-     * @param  {boolean} inverted     true if this pin should be handled inverted (true=low, false=high)
-     * @param  {boolean} initialValue (optional) The initial value of this pin, which will be set immediatly.
+     * @param  {PCF8574.PinNumber} pin          The pin number. (0 to 7)
+     * @param  {boolean}           inverted     true if this pin should be handled inverted (true=low, false=high)
+     * @param  {boolean}           initialValue (optional) The initial value of this pin, which will be set immediatly.
      * @return {Promise}
      */
-    public outputPin(pin:number, inverted:boolean, initialValue?:boolean):Promise<{}>;
+    public outputPin(pin:PCF8574.PinNumber, inverted:boolean, initialValue?:boolean):Promise<{}>;
 
     /**
      * Define a pin as an input.
      * This marks the pin for input processing and activates the high level on this pin.
-     * @param  {number}  pin      The pin.
-     * @param  {boolean} inverted true if this pin should be handled inverted (high=false, low=true)
+     * @param  {PCF8574.PinNumber} pin      The pin number. (0 to 7)
+     * @param  {boolean}           inverted true if this pin should be handled inverted (high=false, low=true)
      * @return {Promise}
      */
-    public inputPin(pin:number, inverted:boolean):Promise<{}>;
+    public inputPin(pin:PCF8574.PinNumber, inverted:boolean):Promise<{}>;
 
     /**
      * Set the value of an output pin.
      * If no value is given, the pin will be toggled.
-     * @param  {number}  pin   The pin.
-     * @param  {boolean} value The new value for this pin.
+     * @param  {PCF8574.PinNumber} pin   The pin number. (0 to 7)
+     * @param  {boolean}           value The new value for this pin.
      * @return {Promise}
      */
     public setPin(pin:number, value?:boolean):Promise<{}>;
 
     /**
      * Set the given value to all output pins.
-     * @param  {boolean}  value The new value for all output pins.
+     * @param  {boolean} value The new value for all output pins.
      * @return {Promise}
      */
     private setAllPins(value:boolean):Promise<{}>;
 
     /**
-     * Get the current value of a pin.
+     * Returns the current value of a pin.
      * This returns the last saved value, not the value currently returned by the PCF8574/PCF9574A IC.
      * To get the current value call doPoll() first, if you're not using interrupts.
-     * @param  {number}  pin The pin.
-     * @return {boolean}     The current value.
+     * @param  {PCF8574.PinNumber} pin The pin number. (0 to 7)
+     * @return {boolean}               The current value.
      */
-    public getPinValue(pin:number):boolean;
+    public getPinValue(pin:PCF8574.PinNumber):boolean;
   }
 }

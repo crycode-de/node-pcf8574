@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2017 Peter Müller <peter@crycode.de> (https://crycode.de)
  *
- * Node.js module for communication with a PCF8574/PCF8574A I2C port expander IC.
+ * Node.js module for controlling each pin of a PCF8574/PCF8574A I2C port expander IC.
  */
 import {EventEmitter} from 'events';
 import * as Promise from 'bluebird';
@@ -52,7 +52,7 @@ export class PCF8574 extends EventEmitter {
   private _gpio:Gpio = null;
 
   /**
-   * Constructor for a PCF8574/PCF8574A IC.
+   * Constructor for a new PCF8574/PCF8574A instance.
    * If you use this IC with one or more input pins, you have to call ...
    *  a) enableInterrupt(gpioPin) to detect interrupts from the IC using a GPIO pin, or
    *  b) doPoll() frequently enough to detect input changes with manually polling.
@@ -114,12 +114,12 @@ export class PCF8574 extends EventEmitter {
 
   /**
    * Helper function to set/clear one bit in a bitmask.
-   * @param  {number}  current The current bitmask.
-   * @param  {number}  pin     The bit-number in the bitmask.
-   * @param  {boolean} value   The new value for the bit. (true=set, false=clear)
-   * @return {number}          The new (modified) bitmask.
+   * @param  {number}            current The current bitmask.
+   * @param  {PCF8574.PinNumber} pin     The bit-number in the bitmask.
+   * @param  {boolean}           value   The new value for the bit. (true=set, false=clear)
+   * @return {number}                    The new (modified) bitmask.
    */
-  private _setStatePin(current:number, pin:number, value:boolean):number{
+  private _setStatePin(current:number, pin:PCF8574.PinNumber, value:boolean):number{
     if(value){
       // set the bit
       return current | 1 << pin;
@@ -174,10 +174,10 @@ export class PCF8574 extends EventEmitter {
    * If a change on an input is detected, an "input" Event will be emitted with a data object containing the "pin" and the new "value".
    * This is called if an interrupt occured, or if doPoll() is called manually.
    * Additionally this is called if a new input is defined to read the current state of this pin.
-   * @param {number} noEmit (optional) Pin number of a pin which should not trigger an event. (used for getting the current state while defining a pin as input)
+   * @param {PCF8574.PinNumber} noEmit (optional) Pin number of a pin which should not trigger an event. (used for getting the current state while defining a pin as input)
    * @return {Promise}
    */
-  private _poll(noEmit?:number):Promise<{}>{
+  private _poll(noEmit?:PCF8574.PinNumber):Promise<{}>{
     if(this._currentlyPolling){
       return Promise.reject('An other poll is in progress');
     }
@@ -204,9 +204,9 @@ export class PCF8574 extends EventEmitter {
           if((this._currentState>>pin) % 2 !== (readState>>pin) % 2){
             // pin changed
             let value:boolean = ((readState>>pin) % 2 !== 0);
-            this._currentState = this._setStatePin(this._currentState, pin, value);
+            this._currentState = this._setStatePin(this._currentState, <PCF8574.PinNumber>pin, value);
             if(noEmit !== pin){
-              this.emit('input', {pin: pin, value: value});
+              this.emit('input', <PCF8574.InputData>{pin: pin, value: value});
             }
           }
         }
@@ -219,12 +219,12 @@ export class PCF8574 extends EventEmitter {
   /**
    * Define a pin as an output.
    * This marks the pin to be used as an output pin.
-   * @param  {number}  pin          The pin.
-   * @param  {boolean} inverted     true if this pin should be handled inverted (true=low, false=high)
-   * @param  {boolean} initialValue (optional) The initial value of this pin, which will be set immediatly.
+   * @param  {PCF8574.PinNumber} pin          The pin number. (0 to 7)
+   * @param  {boolean}           inverted     true if this pin should be handled inverted (true=low, false=high)
+   * @param  {boolean}           initialValue (optional) The initial value of this pin, which will be set immediatly.
    * @return {Promise}
    */
-  public outputPin(pin:number, inverted:boolean, initialValue?:boolean):Promise<{}>{
+  public outputPin(pin:PCF8574.PinNumber, inverted:boolean, initialValue?:boolean):Promise<{}>{
     if(pin < 0 || pin > 7){
       return Promise.reject(new Error('Pin out of range'));
     }
@@ -246,11 +246,11 @@ export class PCF8574 extends EventEmitter {
   /**
    * Define a pin as an input.
    * This marks the pin for input processing and activates the high level on this pin.
-   * @param  {number}  pin      The pin.
-   * @param  {boolean} inverted true if this pin should be handled inverted (high=false, low=true)
+   * @param  {PCF8574.PinNumber} pin      The pin number. (0 to 7)
+   * @param  {boolean}           inverted true if this pin should be handled inverted (high=false, low=true)
    * @return {Promise}
    */
-  public inputPin(pin:number, inverted:boolean):Promise<{}>{
+  public inputPin(pin:PCF8574.PinNumber, inverted:boolean):Promise<{}>{
     if(pin < 0 || pin > 7){
       return Promise.reject(new Error('Pin out of range'));
     }
@@ -272,11 +272,11 @@ export class PCF8574 extends EventEmitter {
   /**
    * Set the value of an output pin.
    * If no value is given, the pin will be toggled.
-   * @param  {number}  pin   The pin.
-   * @param  {boolean} value The new value for this pin.
+   * @param  {PCF8574.PinNumber} pin   The pin number. (0 to 7)
+   * @param  {boolean}           value The new value for this pin.
    * @return {Promise}
    */
-  public setPin(pin:number, value?:boolean):Promise<{}>{
+  public setPin(pin:PCF8574.PinNumber, value?:boolean):Promise<{}>{
     if(pin < 0 || pin > 7){
       return Promise.reject(new Error('Pin out of range'));
     }
@@ -295,11 +295,11 @@ export class PCF8574 extends EventEmitter {
 
   /**
    * Internal function to set the state of a pin, regardless its direction.
-   * @param  {number}   pin   The pin.
-   * @param  {boolean}  value The new value.
+   * @param  {PCF8574.PinNumber} pin   The pin number. (0 to 7)
+   * @param  {boolean}           value The new value.
    * @return {Promise}
    */
-  private _setPinInternal(pin:number, value:boolean):Promise<{}>{
+  private _setPinInternal(pin:PCF8574.PinNumber, value:boolean):Promise<{}>{
     let newState:number = this._setStatePin(this._currentState, pin, value);
 
     return this._setNewState(newState);
@@ -307,7 +307,7 @@ export class PCF8574 extends EventEmitter {
 
   /**
    * Set the given value to all output pins.
-   * @param  {boolean}  value The new value for all output pins.
+   * @param  {boolean} value The new value for all output pins.
    * @return {Promise}
    */
   private setAllPins(value:boolean):Promise<{}>{
@@ -317,20 +317,20 @@ export class PCF8574 extends EventEmitter {
       if(this._directions[pin] !== PCF8574.DIR_OUT){
         continue; // isn't an output pin
       }
-      newState = this._setStatePin(newState, pin, value);
+      newState = this._setStatePin(newState, <PCF8574.PinNumber>pin, value);
     }
 
     return this._setNewState(newState);
   }
 
   /**
-   * Get the current value of a pin.
+   * Returns the current value of a pin.
    * This returns the last saved value, not the value currently returned by the PCF8574/PCF9574A IC.
    * To get the current value call doPoll() first, if you're not using interrupts.
-   * @param  {number}  pin The pin.
-   * @return {boolean}     The current value.
+   * @param  {PCF8574.PinNumber} pin The pin number. (0 to 7)
+   * @return {boolean}               The current value.
    */
-  public getPinValue(pin:number):boolean{
+  public getPinValue(pin:PCF8574.PinNumber):boolean{
     if(pin < 0 || pin > 7){
       return false;
     }
