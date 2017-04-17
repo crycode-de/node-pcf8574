@@ -13,7 +13,6 @@
 var PCF8574 = require('../').PCF8574;
 
 // Require the i2c-bus module and open the bus
-// This is only needed to use interrupts for input changed detection
 var i2cBus = require('i2c-bus').openSync(1);
 
 // Define the address of the PCF8574/PCF8574A
@@ -63,7 +62,6 @@ pcf.outputPin(0, true, false)
   console.log('turn pin 0 off');
   return pcf.setPin(0, false);
 });
-
 
 // Add an event listener on the 'input' event
 pcf.on('input', function(data){

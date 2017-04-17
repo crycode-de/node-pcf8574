@@ -1,12 +1,14 @@
 {
   "name": "pcf8574",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Control each pin of a PCF8574/PCF8574A I2C port expander IC.",
   "keywords": [
     "pcf8574",
     "pcf8574a",
+    "pcf8574p",
     "i2c",
     "portexpander",
+    "raspberry pi",
     "gpio"
   ],
   "main": "dist/pcf8574.js",
@@ -17,7 +19,7 @@
   },
   "author": "Peter Müller <peter@crycode.de> (https://crycode.de)",
   "license": "GPL-2.0",
-  "homepage": "https://git.cryhost.de/crycode/node-pcf8574",
+  "homepage": "https://crycode.de/node-js-modul-pcf8574",
   "repository": {
     "type": "git",
     "url": "https://git.cryhost.de/crycode/node-pcf8574.git"

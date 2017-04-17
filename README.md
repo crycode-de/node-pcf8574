@@ -1,9 +1,12 @@
 # pcf8574
 
+[![npm version](https://badge.fury.io/js/pcf8574.svg)](https://badge.fury.io/js/pcf8574)
+[![build status](https://git.cryhost.de/crycode/node-pcf8574/badges/master/build.svg)](https://git.cryhost.de/crycode/node-pcf8574/commits/master)
+
 Control each pin of a PCF8574/PCF8574A I2C port expander IC.
 
 The PCF8574/PCF8574A is an 8 bit/pin port expander IC, which can be controlled over the I2C-Bus.
-Each of the 8 pins can be seprately used as an input or output.
+Each of the 8 pins can be separately used as an input or output.
 It also offers an interrupt signal, which can be used to detect input changes by the I2C master (e.g. a Raspberry Pi).
 For more information about the PCF8574/PCF8574A please consult the [datasheet from Texas Instruments](http://www.ti.com/lit/ds/symlink/pcf8574.pdf).
 
@@ -34,7 +37,6 @@ var PCF8574 = require('pcf8574').PCF8574;
 // import {PCF8574} from 'pcf8574';
 
 // Require the i2c-bus module and open the bus
-// This is only needed to use interrupts for input changed detection
 var i2cBus = require('i2c-bus').openSync(1);
 
 // Define the address of the PCF8574/PCF8574A
@@ -85,7 +87,6 @@ pcf.outputPin(0, true, false)
   return pcf.setPin(0, false);
 });
 
-
 // Add an event listener on the 'input' event
 pcf.on('input', function(data){
   console.log('input', data);
@@ -120,7 +121,7 @@ If an inverted input has a low level it will be interpreted as true and a high l
 An inverted output will write a low level if you set it to true and write a high level if false.
 
 
-### PCF8574(i2cBus, address, initialState)
+### new PCF8574(i2cBus, address, initialState)
 ```ts
 constructor(i2cBus:I2cBus, address:number, initialState:boolean|number);
 ```
@@ -130,8 +131,7 @@ Constructor for a new PCF8574/PCF8574A instance.
 * `address` - The address of the PCF8574/PCF8574A IC.
 * `initialState` - The initial state of the pins of this IC. You can set a bitmask (e.g. *0b00101010*) to define each pin seprately, or use true/false for all pins at once.
 
-Note that you need to construct the [i2c-bus](https://npmjs.org/package/i2c-bus) object
-and pass it in to the module.
+Note that you need to construct the [i2c-bus](https://npmjs.org/package/i2c-bus) object and pass it in to the module.
 
 If you use this IC with one or more input pins, you have to call
 * `enableInterrupt(gpioPin)` to detect interrupts from the IC using a GPIO pin, or

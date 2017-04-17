@@ -16,7 +16,6 @@
 import {PCF8574} from 'pcf8574';
 
 // Import the i2c-bus module and open the bus
-// This is only needed to use interrupts for input changed detection
 import {I2cBus, openSync as I2cBusOpenSync} from 'i2c-bus';
 const i2cBus:I2cBus = I2cBusOpenSync(1);
 
@@ -67,7 +66,6 @@ pcf.outputPin(0, true, false)
   console.log('turn pin 0 off');
   return pcf.setPin(0, false);
 });
-
 
 // Add an event listener on the 'input' event
 pcf.on('input', function(data:PCF8574.InputData){
