@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/pcf8574.svg)](https://badge.fury.io/js/pcf8574)
 [![build status](https://git.cryhost.de/crycode/node-pcf8574/badges/master/build.svg)](https://git.cryhost.de/crycode/node-pcf8574/commits/master)
 
-Control each pin of a PCF8574/PCF8574A I2C port expander IC.
+Control each pin of a PCF8574/PCF8574A/PCF8574P I2C port expander IC.
 
 The PCF8574/PCF8574A is an 8 bit/pin port expander IC, which can be controlled over the I2C-Bus.
 Each of the 8 pins can be separately used as an input or output.

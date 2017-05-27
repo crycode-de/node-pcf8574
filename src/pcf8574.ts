@@ -137,12 +137,12 @@ export class PCF8574 extends EventEmitter {
   private _setNewState(newState?:number):Promise<{}>{
     return new Promise((resolve:()=>void, reject:(err:Error)=>void)=>{
 
-      if(typeof(newState) === 'undefined'){
-        newState = this._currentState;
+      if(typeof(newState) === 'number'){
+        this._currentState = newState;
       }
 
       // repect inverted with bitmask using XOR
-      let newIcState = newState ^ this._inverted;
+      let newIcState = this._currentState ^ this._inverted;
 
       // set all input pins to high
       newIcState = newIcState | this._inputPinBitmask;
@@ -151,7 +151,6 @@ export class PCF8574 extends EventEmitter {
         if(err){
           reject(err);
         }else{
-          this._currentState = newState;
           resolve();
         }
       });
