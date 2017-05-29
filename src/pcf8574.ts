@@ -18,11 +18,14 @@ export class PCF8574 extends EventEmitter {
   /** Constant for undefined pin direction (unused pin). */
   public static readonly DIR_UNDEF = -1;
 
-    /** Constant for input pin direction. */
+  /** Constant for input pin direction. */
   public static readonly DIR_IN = 1;
 
-    /** Constant for output pin direction. */
+  /** Constant for output pin direction. */
   public static readonly DIR_OUT = 0;
+
+  /** Object containing all GPIOs used by any PCF8574 instance. */
+  private static _allInstancesUsedGpios = {};
 
   /** The instance of the i2c-bus, which is used for the I2C communication. */
   private _i2cBus:I2cBus;
@@ -63,6 +66,9 @@ export class PCF8574 extends EventEmitter {
   constructor(i2cBus:I2cBus, address:number, initialState:boolean|number){
     super();
 
+    // bind the _handleInterrupt method strictly to this instance
+    this._handleInterrupt = this._handleInterrupt.bind(this);
+
     this._i2cBus = i2cBus;
 
     if(address < 0 || address > 255){
@@ -87,27 +93,47 @@ export class PCF8574 extends EventEmitter {
 
   /**
    * Enable the interrupt detection on the specified GPIO pin.
+   * You can use one GPIO pin for multiple instances of the PCF8574 class.
    * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC.
    */
   public enableInterrupt(gpioPin:number):void{
-    // init the GPIO as input with falling edge,
-    // because the PCF8574/PCF8574A will lower the interrupt line on changes
-    this._gpio = new Gpio(gpioPin, 'in', 'falling');
-    this._gpio.watch(()=>{
-      // poll the current state and ignore any rejected promise
-      this._poll().catch(()=>{ });
-    });
+    if(PCF8574._allInstancesUsedGpios[gpioPin] != null){
+      // use already initalized GPIO
+      this._gpio = PCF8574._allInstancesUsedGpios[gpioPin];
+      this._gpio['pcf8574UseCount']++;
+    }else{
+      // init the GPIO as input with falling edge,
+      // because the PCF8574/PCF8574A will lower the interrupt line on changes
+      this._gpio = new Gpio(gpioPin, 'in', 'falling');
+      this._gpio['pcf8574UseCount'] = 1;
+    }
+    this._gpio.watch(this._handleInterrupt);
+  }
+
+  /**
+   * Internal function to handle a GPIO interrupt.
+   */
+  private _handleInterrupt():void{
+    // poll the current state and ignore any rejected promise
+    this._poll().catch(()=>{ });
   }
 
   /**
    * Disable the interrupt detection.
-   * This will unexport the interrupt GPIO, if used.
+   * This will unexport the interrupt GPIO, if it is not used by an other instance of this class.
    */
   public disableInterrupt():void{
     // release the used GPIO
     if(this._gpio !== null){
-      this._gpio.unwatchAll();
-      this._gpio.unexport();
+      // remove the interrupt handling
+      this._gpio.unwatch(this._handleInterrupt);
+
+      // decrease the use count of the GPIO and unexport it if not used anymore
+      this._gpio['pcf8574UseCount']--;
+      if(this._gpio['pcf8574UseCount'] === 0){
+        this._gpio.unexport();
+      }
+
       this._gpio = null;
     }
   }

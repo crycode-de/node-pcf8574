@@ -72,13 +72,14 @@ declare module 'pcf8574' {
 
     /**
      * Enable the interrupt detection on the specified GPIO pin.
+     * You can use one GPIO pin for multiple instances of the PCF8574 class.
      * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC.
      */
     public enableInterrupt(gpioPin:number):void;
 
     /**
      * Disable the interrupt detection.
-     * This will unexport the interrupt GPIO, if used.
+     * This will unexport the interrupt GPIO, if it is not used by an other instance of this class.
      */
     public disableInterrupt():void;
 

@@ -142,6 +142,7 @@ If you use this IC with one or more input pins, you have to call
 enableInterrupt(gpioPin:PCF8574.PinNumber):void;
 ```
 Enable the interrupt detection on the specified GPIO pin.
+You can use one GPIO pin for multiple instances of the PCF8574 class.
 
 * `gpioPin` - BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC.
 
@@ -151,7 +152,7 @@ Enable the interrupt detection on the specified GPIO pin.
 disableInterrupt():void;
 ```
 Disable the interrupt detection.
-This will unexport the interrupt GPIO, if used.
+This will unexport the interrupt GPIO, if it is not used by an other instance of this class.
 
 
 ### doPoll()
