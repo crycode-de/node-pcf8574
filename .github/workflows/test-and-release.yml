@@ -54,7 +54,6 @@ jobs:
         if: |
             contains(github.event.head_commit.message, '[skip ci]') == false &&
             github.event_name == 'push' &&
-            github.event.base_ref == 'refs/heads/master' &&
             startsWith(github.ref, 'refs/tags/v')
         runs-on: ubuntu-latest
         strategy:
@@ -88,9 +87,13 @@ jobs:
               run: npm run build
 
             - name: Publish package to npm
+              #run: |
+              #    npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
+              #    npm whoami
+              #    npm publish
+              ## npm automation tokens doesn't support whoami
               run: |
                   npm config set //registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}
-                  npm whoami
                   npm publish
             - name: Create Github Release
               uses: actions/create-release@v1
