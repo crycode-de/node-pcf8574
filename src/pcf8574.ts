@@ -150,8 +150,8 @@ export class PCF8574 extends EventEmitter {
    * You can use one GPIO pin for multiple instances of the PCF8574 class.
    * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC.
    */
-  public enableInterrupt (gpioPin:number): void {
-    if (PCF8574._allInstancesUsedGpios[gpioPin] != null) {
+  public enableInterrupt (gpioPin: number): void {
+    if (PCF8574._allInstancesUsedGpios[gpioPin]) {
       // use already initalized GPIO
       this._gpio = PCF8574._allInstancesUsedGpios[gpioPin];
       this._gpio['pcf8574UseCount']++;
@@ -160,6 +160,7 @@ export class PCF8574 extends EventEmitter {
       // because the PCF8574/PCF8574A will lower the interrupt line on changes
       this._gpio = new Gpio(gpioPin, 'in', 'falling');
       this._gpio['pcf8574UseCount'] = 1;
+      PCF8574._allInstancesUsedGpios[gpioPin] = this._gpio;
     }
     this._gpio.watch(this._handleInterrupt);
   }
