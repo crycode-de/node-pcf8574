@@ -16,7 +16,7 @@ Each of the 8 pins can be separately used as an input or output.
 It also offers an interrupt signal, which can be used to detect input changes by the I2C master (e.g. a Raspberry Pi).
 For more information about the PCF8574/PCF8574A please consult the [datasheet from Texas Instruments](http://www.ti.com/lit/ds/symlink/pcf8574.pdf).
 
-**Supported (tested) Node.js versions:** 8, 10, 12, 14
+**Supported (tested) Node.js versions:** 10, 12, 14
 
 ## Installation
 

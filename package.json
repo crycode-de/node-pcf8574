@@ -20,7 +20,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=10.0.0"
   },
   "author": "Peter Müller <peter@crycode.de> (https://crycode.de)",
   "license": "GPL-2.0",
