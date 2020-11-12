@@ -39,21 +39,21 @@ The example blow can be found in the [examples directory](https://github.com/cry
 
 ```js
 // Require the pcf8574 module
-var PCF8574 = require('pcf8574').PCF8574;
+const PCF8574 = require('pcf8574').PCF8574;
 
 // Or use ES6 style imports
 // import { PCF8574 } from 'pcf8574';
 
 // Require the i2c-bus module and open the bus
-var i2cBus = require('i2c-bus').openSync(1);
+const i2cBus = require('i2c-bus').openSync(1);
 
 // Define the address of the PCF8574/PCF8574A
-var addr = 0x38;
+const addr = 0x38;
 
 // Init a new PCF8574 with all pins high by default
 // Instead of 'true' you can also use a 8-bit binary notation to define each
 // pin speratly, e.g. 0b00101010
-var pcf = new PCF8574(i2cBus, addr, true);
+const pcf = new PCF8574(i2cBus, addr, true);
 
 // Enable interrupt detection on BCM pin 17 (which is GPIO.0)
 pcf.enableInterrupt(17);
