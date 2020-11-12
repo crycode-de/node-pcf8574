@@ -1,14 +1,13 @@
 {
   "compilerOptions": {
-    "declaration": false,
+    "declaration": true,
     "module": "commonjs",
-    "target": "es5",
+    "target": "es2017",
     "noImplicitAny": false,
     "removeComments": false,
     "outDir": "dist"
   },
-  "files": [
-    "src/pcf8574.ts",
-    "typings/index.d.ts"
+  "include": [
+    "src/**/*.ts"
   ]
 }

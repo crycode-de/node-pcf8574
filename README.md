@@ -1,7 +1,13 @@
 # pcf8574
 
-[![npm version](https://badge.fury.io/js/pcf8574.svg)](https://badge.fury.io/js/pcf8574)
-[![build status](https://git.cryhost.de/crycode/node-pcf8574/badges/master/build.svg)](https://git.cryhost.de/crycode/node-pcf8574/commits/master)
+[![NPM version](https://img.shields.io/npm/v/pcf8574.svg)](https://www.npmjs.com/package/pcf8574)
+[![Downloads](https://img.shields.io/npm/dm/pcf8574.svg)](https://www.npmjs.com/package/pcf8574)
+[![Dependency Status](https://img.shields.io/david/crycode-de/node-pcf8574.svg)](https://david-dm.org/crycode-de/node-pcf8574)
+[![Known Vulnerabilities](https://snyk.io/test/github/crycode-de/node-pcf8574/badge.svg)](https://snyk.io/test/github/crycode-de/node-pcf8574)
+
+[![NPM](https://nodei.co/npm/pcf8574.png?downloads=true)](https://nodei.co/npm/pcf8574/)
+
+**Tests:** ![Test and Release](https://github.com/crycode-de/node-pcf8574/workflows/Test%20and%20Release/badge.svg)
 
 Control each pin of a PCF8574/PCF8574A/PCF8574P I2C port expander IC.
 
@@ -9,6 +15,8 @@ The PCF8574/PCF8574A is an 8 bit/pin port expander IC, which can be controlled o
 Each of the 8 pins can be separately used as an input or output.
 It also offers an interrupt signal, which can be used to detect input changes by the I2C master (e.g. a Raspberry Pi).
 For more information about the PCF8574/PCF8574A please consult the [datasheet from Texas Instruments](http://www.ti.com/lit/ds/symlink/pcf8574.pdf).
+
+**Supported (tested) Node.js versions:** 8, 10, 12, 14
 
 ## Installation
 
@@ -27,14 +35,14 @@ To use the interrupt detection you need a Raspberry Pi or a similar board.
 Note that you need to construct the [i2c-bus](https://npmjs.org/package/i2c-bus) object
 and pass it in to the module along with the I2C address of the PCF8574/PCF8574A.
 
-The example blow can be found in the [examples directory](https://git.cryhost.de/crycode/node-pcf8574/tree/master/examples) of this package together with a TypeScript example.
+The example blow can be found in the [examples directory](https://github.com/crycode-de/node-pcf8574/tree/master/examples) of this package together with a TypeScript example.
 
 ```js
 // Require the pcf8574 module
 var PCF8574 = require('pcf8574').PCF8574;
 
 // Or use ES6 style imports
-// import {PCF8574} from 'pcf8574';
+// import { PCF8574 } from 'pcf8574';
 
 // Require the i2c-bus module and open the bus
 var i2cBus = require('i2c-bus').openSync(1);
@@ -60,35 +68,39 @@ pcf.enableInterrupt(17);
 pcf.outputPin(0, true, false)
 
 // Then define pin 1 as inverted output with initally true
-.then(function(){
+.then(() => {
   return pcf.outputPin(1, true, true);
 })
 
 // Then define pin 7 as non inverted input
-.then(function(){
+.then(() => {
   return pcf.inputPin(7, false);
 })
 
 // Delay 1 second
-.delay(1000)
+.then(() => new Promise((resolve) => {
+  setTimeout(resolve, 1000);
+}))
 
 // Then turn the pin on
-.then(function(){
+.then(() => {
   console.log('turn pin 0 on');
   return pcf.setPin(0, true);
 })
 
 // Delay 1 second
-.delay(1000)
+.then(() => new Promise((resolve) => {
+  setTimeout(resolve, 1000);
+}))
 
 // Then turn the pin off
-.then(function(){
+.then(() => {
   console.log('turn pin 0 off');
   return pcf.setPin(0, false);
 });
 
 // Add an event listener on the 'input' event
-pcf.on('input', function(data){
+pcf.on('input', (data) => {
   console.log('input', data);
 
   // Check if a button attached to pin 7 is pressed (signal goes low)
@@ -99,7 +111,7 @@ pcf.on('input', function(data){
 });
 
 // Handler for clean up on SIGINT (ctrl+c)
-process.on('SIGINT', function(){
+process.on('SIGINT', () => {
   pcf.removeAllListeners();
   pcf.disableInterrupt();
 });
@@ -123,7 +135,7 @@ An inverted output will write a low level if you set it to true and write a high
 
 ### new PCF8574(i2cBus, address, initialState)
 ```ts
-constructor(i2cBus:I2cBus, address:number, initialState:boolean|number);
+constructor (i2cBus: I2CBus, address: number, initialState: boolean | number);
 ```
 Constructor for a new PCF8574/PCF8574A instance.
 
@@ -139,7 +151,7 @@ If you use this IC with one or more input pins, you have to call
 
 ### enableInterrupt(gpioPin)
 ```ts
-enableInterrupt(gpioPin:PCF8574.PinNumber):void;
+enableInterrupt (gpioPin: PCF8574.PinNumber): void;
 ```
 Enable the interrupt detection on the specified GPIO pin.
 You can use one GPIO pin for multiple instances of the PCF8574 class.
@@ -149,7 +161,7 @@ You can use one GPIO pin for multiple instances of the PCF8574 class.
 
 ### disableInterrupt()
 ```ts
-disableInterrupt():void;
+disableInterrupt (): void;
 ```
 Disable the interrupt detection.
 This will unexport the interrupt GPIO, if it is not used by an other instance of this class.
@@ -157,7 +169,7 @@ This will unexport the interrupt GPIO, if it is not used by an other instance of
 
 ### doPoll()
 ```ts
-doPoll():Promise<{}>;
+doPoll (): Promise<void>;
 ```
 Manually poll changed inputs from the PCF8574/PCF8574A IC.
 
@@ -168,7 +180,7 @@ If you poll again before the last poll was completed, the promise will be reject
 
 ### outputPin(pin, inverted, initialValue)
 ```ts
-outputPin(pin:PCF8574.PinNumber, inverted:boolean, initialValue?:boolean):Promise<{}>;
+outputPin (pin: PCF8574.PinNumber, inverted: boolean, initialValue?: boolean): Promise<void>;
 ```
 Define a pin as an output.
 This marks the pin to be used as an output pin.
@@ -181,7 +193,7 @@ Returns a Promise which will be resolved when the pin is ready.
 
 ### inputPin(pin, inverted)
 ```ts
-inputPin(pin:PCF8574.PinNumber, inverted:boolean):Promise<{}>;
+inputPin (pin: PCF8574.PinNumber, inverted: boolean): Promise<>;
 ```
 Define a pin as an input.
 This marks the pin for input processing and activates the high level on this pin.
@@ -195,7 +207,7 @@ Note that an input is always set to high (pullup) internally.
 
 ### setPin(pin, value)
 ```ts
-setPin(pin:PCF8574.PinNumber, value?:boolean):Promise<{}>;
+setPin (pin: PCF8574.PinNumber, value?: boolean): Promise<void>;
 ```
 Set the value of an output pin.
 If no value is given, the pin will be toggled.
@@ -207,7 +219,7 @@ Returns a Promise which will be resolved when the new value is written to the IC
 
 ### setAllPins(value)
 ```ts
-setAllPins(value:boolean):Promise<{}>;
+setAllPins (value: boolean): Promise<void>;
 ```
 Set the given value to all output pins.
 Returns a Promise which will be resolved when the new values are written to the IC.
@@ -217,7 +229,7 @@ Returns a Promise which will be resolved when the new values are written to the 
 
 ### getPinValue(pin)
 ```ts
-getPinValue(pin:PCF8574.PinNumber):boolean;
+getPinValue (pin: PCF8574.PinNumber): boolean;
 ```
 Returns the current value of a pin.
 This returns the last saved value, not the value currently returned by the PCF8574/PCF9574A IC.
@@ -230,4 +242,4 @@ To get the current value call doPoll() first, if you're not using interrupts.
 
 Licensed under GPL Version 2
 
-Copyright (c) 2017 Peter Müller <peter@crycode.de> (https://crycode.de/)
+Copyright (c) 2017-2020 Peter Müller <peter@crycode.de> (https://crycode.de/)
