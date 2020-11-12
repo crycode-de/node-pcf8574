@@ -1,5 +1,5 @@
 ## v2.0.0 2020-11-12
-- Supported Node.js versions: 8, 10, 12, 14
+- Supported Node.js versions: 10, 12, 14
 - Updated all dependencies
 - Use native `Promise` instead of `bluebird`
 - Some code optimizations
