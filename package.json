@@ -43,6 +43,6 @@
   },
   "dependencies": {
     "i2c-bus": "^5.2.1",
-    "onoff": "^6.0.1"
+    "onoff": "^6.0.3"
   }
 }
