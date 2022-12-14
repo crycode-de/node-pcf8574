@@ -16,7 +16,7 @@ Each of the 8 pins can be separately used as an input or output.
 It also offers an interrupt signal, which can be used to detect input changes by the I2C master (e.g. a Raspberry Pi).
 For more information about the PCF8574/PCF8574A please consult the [datasheet from Texas Instruments](http://www.ti.com/lit/ds/symlink/pcf8574.pdf).
 
-**Supported (tested) Node.js versions:** 10, 12, 14
+**Supported (tested) Node.js versions:** 10, 12, 14, 16, 18
 
 ## Installation
 
@@ -52,7 +52,7 @@ const addr = 0x38;
 
 // Init a new PCF8574 with all pins high by default
 // Instead of 'true' you can also use a 8-bit binary notation to define each
-// pin speratly, e.g. 0b00101010
+// pin separately, e.g. 0b00101010
 const pcf = new PCF8574(i2cBus, addr, true);
 
 // Enable interrupt detection on BCM pin 17 (which is GPIO.0)
@@ -242,4 +242,5 @@ To get the current value call doPoll() first, if you're not using interrupts.
 
 Licensed under GPL Version 2
 
-Copyright (c) 2017-2020 Peter Müller <peter@crycode.de> (https://crycode.de/)
+Copyright (c) 2017-2022 Peter Müller <peter@crycode.de> (<https://crycode.de/>)  
+2022 - PCF7585 support inspired by Lyndel McGee <lynniemagoo@yahoo.com>

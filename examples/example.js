@@ -1,7 +1,7 @@
 /*
  * Node.js PCF8574/PCF8574A
  *
- * Copyright (c) 2017-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * Copyright (c) 2017-2022 Peter Müller <peter@crycode.de> (https://crycode.de)
  *
  * Node.js module for controlling each pin of a PCF8574/PCF8574A I2C port expander IC.
  *
@@ -20,7 +20,7 @@ const addr = 0x38;
 
 // Init a new PCF8574 with all pins high by default
 // Instead of 'true' you can also use a 8-bit binary notation to define each
-// pin speratly, e.g. 0b00101010
+// pin separately, e.g. 0b00101010
 const pcf = new PCF8574(i2cBus, addr, true);
 
 // Enable interrupt detection on BCM pin 17 (which is GPIO.0)

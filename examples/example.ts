@@ -21,7 +21,7 @@ const addr: number = 0x38;
 
 // Init a new PCF8574 with all pins high by default
 // Instead of 'true' you can also use a 8-bit binary notation to define each
-// pin speratly, e.g. 0b00101010
+// pin separately, e.g. 0b00101010
 const pcf: PCF8574 = new PCF8574(i2cBus, addr, true);
 
 // Enable interrupt detection on BCM pin 17 (which is GPIO.0)
