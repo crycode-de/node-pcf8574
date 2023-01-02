@@ -17,7 +17,7 @@ const PCF8575 = require('../').PCF8575;
 const i2cBus = require('i2c-bus').openSync(1);
 
 // Define the address of the PCF8575
-const addr = 0x38;
+const addr = 0x20;
 
 // Init a new PCF8575 with all pins high by default
 // Instead of 'true' you can also use a 16-bit binary notation to define each
