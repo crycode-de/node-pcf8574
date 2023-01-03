@@ -2,7 +2,7 @@
  * Node.js PCF8574/PCF8574A/PCF8575
  *
  * Copyright (c) 2017-2022 Peter Müller <peter@crycode.de> (https://crycode.de)
- *               2022 - PCF7585 support inspired by Lyndel McGee <lynniemagoo@yahoo.com>
+ *               2022 - PCF8575 support inspired by Lyndel McGee <lynniemagoo@yahoo.com>
  *
  * Node.js module for controlling each pin of a PCF857x I2C port expander IC.
  */
@@ -181,7 +181,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
     this._currentState = initialState;
     switch (this._type) {
       case PCF857x_TYPE.PCF8574:
-        this._i2cBus.sendByteSync(this._address, this._currentState);
+        this._i2cBus.i2cWriteSync(this._address, 1, Buffer.from([this._currentState & 0xFF]));
         break;
       case PCF857x_TYPE.PCF8575:
         this._i2cBus.i2cWriteSync(this._address, 2, Buffer.from([this._currentState & 0xFF, (this._currentState >>> 8) & 0xFF]));
@@ -284,7 +284,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
       // send
       switch (this._type) {
         case PCF857x_TYPE.PCF8574:
-          this._i2cBus.sendByte(this._address, newIcState, cb);
+          this._i2cBus.i2cWrite(this._address, 1, Buffer.from([newIcState & 0xFF]), cb);
           break;
         case PCF857x_TYPE.PCF8575:
           this._i2cBus.i2cWrite(this._address, 2, Buffer.from([newIcState & 0xFF, (newIcState >>> 8) & 0xFF]), cb);
@@ -345,12 +345,15 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
       // read from the IC - type specific
       switch (this._type) {
         case PCF857x_TYPE.PCF8574:
-          this._i2cBus.receiveByte(this._address, (err: Error, readState: number) => {
+          this._i2cBus.i2cRead(this._address, 1, Buffer.alloc(1), (err: Error, bytesRead: number, buffer: Buffer) => {
             this._currentlyPolling = false;
-            if (err) {
+            if (err || bytesRead !== 1) {
               reject(err);
               return;
             }
+
+            // Readstate is 8 bits.  Pins 0-7 are in byte.
+            const readState = buffer[0];
 
             processRead(readState);
           });
