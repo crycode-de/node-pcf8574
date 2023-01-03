@@ -1,28 +1,28 @@
 /*
- * Node.js PCF8574/PCF8574A
+ * Node.js PCF8575
  *
  * Copyright (c) 2017-2022 Peter Müller <peter@crycode.de> (https://crycode.de)
  *               2022 - PCF8575 support inspired by Lyndel McGee <lynniemagoo@yahoo.com>
  *
- * Node.js module for controlling each pin of a PCF8574/PCF8574A I2C port expander IC.
+ * Node.js module for controlling each pin of a PCF8575 I2C port expander IC.
  *
  * This example is showing you how to setup and use inputs and outputs.
  */
 
-// Require the pcf8574 module
-//const PCF8574 = require('pcf8574').PCF8574;
-const PCF8574 = require('../').PCF8574;
+// Require the pcf8575 module
+//const PCF8575 = require('pcf8575').PCF8575;
+const PCF8575 = require('../').PCF8575;
 
 // Require the i2c-bus module and open the bus
 const i2cBus = require('i2c-bus').openSync(1);
 
-// Define the address of the PCF8574/PCF8574A
-const addr = 0x38;
+// Define the address of the PCF8575
+const addr = 0x20;
 
-// Init a new PCF8574 with all pins high by default
-// Instead of 'true' you can also use a 8-bit binary notation to define each
-// pin separately, e.g. 0b00101010
-const pcf = new PCF8574(i2cBus, addr, true);
+// Init a new PCF8575 with all pins high by default
+// Instead of 'true' you can also use a 16-bit binary notation to define each
+// pin separately, e.g. 0b0000000000101010
+const pcf = new PCF8575(i2cBus, addr, true);
 
 // Enable interrupt detection on BCM pin 17 (which is GPIO.0)
 pcf.enableInterrupt(17);
