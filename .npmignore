@@ -1,7 +1,9 @@
 .github
 .vscode
+examples/
 node_modules/
 src/
+CHANGELOG.md
 .eslint*
 tsconfig.json
 **/*.log
