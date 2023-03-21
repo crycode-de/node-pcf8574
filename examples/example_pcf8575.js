@@ -1,7 +1,7 @@
 /*
  * Node.js PCF8575
  *
- * Copyright (c) 2017-2022 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * Copyright (c) 2017-2023 Peter Müller <peter@crycode.de> (https://crycode.de)
  *               2022 - PCF8575 support inspired by Lyndel McGee <lynniemagoo@yahoo.com>
  *
  * Node.js module for controlling each pin of a PCF8575 I2C port expander IC.
@@ -9,8 +9,8 @@
  * This example is showing you how to setup and use inputs and outputs.
  */
 
-// Require the pcf8575 module
-//const PCF8575 = require('pcf8575').PCF8575;
+// Require the PCF8575 class from the pcf8574 module
+//const PCF8575 = require('pcf8574').PCF8575;
 const PCF8575 = require('../').PCF8575;
 
 // Require the i2c-bus module and open the bus
@@ -37,7 +37,7 @@ pcf.enableInterrupt(17);
 pcf.outputPin(0, true, false)
 
 // Then define pin 1 as inverted output with initally true
-.then(() =>{
+.then(() => {
   return pcf.outputPin(1, true, true);
 })
 

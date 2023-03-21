@@ -1,7 +1,7 @@
 /*
  * Node.js PCF8574/PCF8574A
  *
- * Copyright (c) 2017-2022 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * Copyright (c) 2017-2023 Peter Müller <peter@crycode.de> (https://crycode.de)
  *
  * Node.js module for controlling each pin of a PCF8574/PCF8574A I2C port expander IC.
  */

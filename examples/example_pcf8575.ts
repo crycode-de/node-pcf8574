@@ -1,7 +1,7 @@
 /*
  * Node.js PCF8575
  *
- * Copyright (c) 2017-2020 Peter Müller <peter@crycode.de> (https://crycode.de)
+ * Copyright (c) 2017-2023 Peter Müller <peter@crycode.de> (https://crycode.de)
  *               2022 - PCF8575 support inspired by Lyndel McGee <lynniemagoo@yahoo.com>
  *
  * Node.js module for controlling each pin of a PCF8575 I2C port expander IC.
@@ -9,8 +9,8 @@
  * This example is showing you how to setup and use inputs and outputs.
  */
 
-// Import the PCF8575 class from the pcf8575 module
-//import { PCF8575 } from 'pcf8575';
+// Import the PCF8575 class from the pcf8574 module
+//import { PCF8575 } from 'pcf8574';
 import { PCF8575 } from '../';
 
 // Import the i2c-bus module and open the bus

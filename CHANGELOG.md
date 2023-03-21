@@ -1,6 +1,6 @@
 # Changelog
 
-## v3.0.0 WIP
+## v3.0.0 2023-03-21
 
 - Added support for PCF8575 ICs with 16 pins (thanks to Lyndel McGee [#52](https://github.com/crycode-de/node-pcf8574/issues/52))
 - Moved most code parts into a common base class for both supported controller types
