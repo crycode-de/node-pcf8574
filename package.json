@@ -1,6 +1,6 @@
 {
   "name": "pcf8574",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Control each pin of a PCF8574/PCF8574A/PCF8575 I2C port expander IC.",
   "keywords": [
     "pcf8574",
