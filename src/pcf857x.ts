@@ -199,7 +199,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    */
   public enableInterrupt (gpioPin: number): void {
     if (this._gpio !== null) {
-        throw new Error("GPIO interrupt already enabled.");
+      throw new Error("GPIO interrupt already enabled.");
     }
 
     if (PCF857x._allInstancesUsedGpios[gpioPin]) {
