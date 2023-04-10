@@ -198,8 +198,9 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A/PCF8575 IC.
    */
   public enableInterrupt (gpioPin: number): void {
-    // unregister from current gpio if previously registered - this will also clean up counters and the allInstancesUsedGpios array.
-    this.disableInterrupt();
+    if (this._gpio !== null) {
+        throw new Error("GPIO interrupt already enabled.");
+    }
 
     if (PCF857x._allInstancesUsedGpios[gpioPin]) {
       // use already initialized GPIO
@@ -212,6 +213,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
       this._gpio['pcf857xUseCount'] = 1;
       PCF857x._allInstancesUsedGpios[gpioPin] = this._gpio;
     }
+    // cache this value so we can properly nullify entry in static_allInstancesUsedGpios array during disableInterrupt calls.
     this._gpioPin = gpioPin;
     this._gpio.watch(this._handleInterrupt);
   }

@@ -1,6 +1,6 @@
 # Changelog
 
-## v3.0.2 2023-04-08
+## v3.1.0 2023-04-08
 
 - Fix issues if enableInterrupt() invoked multiple times with same or different gpio pin number. (thanks to Lyndel McGee [#55](https://github.com/crycode-de/node-pcf8574/issues/55))
 
