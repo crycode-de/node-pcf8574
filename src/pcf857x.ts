@@ -123,8 +123,8 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
   /** Flag if we are currently polling changes from the PCF857x IC. */
   private _currentlyPolling: boolean = false;
 
-  /** Pin number of GPIO to detect interrupts, or -1 by default. */
-  private _gpioPin: number = -1;
+  /** Pin number of GPIO to detect interrupts, or null by default. */
+  private _gpioPin: number | null = null;
 
   /** Instance of the used GPIO to detect interrupts, or null if no interrupt is used. */
   private _gpio: Gpio = null;
@@ -213,7 +213,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
       this._gpio['pcf857xUseCount'] = 1;
       PCF857x._allInstancesUsedGpios[gpioPin] = this._gpio;
     }
-    // cache this value so we can properly nullify entry in static_allInstancesUsedGpios array during disableInterrupt calls.
+    // cache this value so we can properly nullify entry in static_allInstancesUsedGpios object during disableInterrupt calls.
     this._gpioPin = gpioPin;
     this._gpio.watch(this._handleInterrupt);
   }
@@ -239,14 +239,13 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
       // decrease the use count of the GPIO and unexport it if not used anymore
       this._gpio['pcf857xUseCount']--;
       if (this._gpio['pcf857xUseCount'] === 0) {
-        // error-proof in case somehow a negative value for gpioPin was somehow allowed during enableInterrupt() call
-        if (this._gpioPin >= 0) {
-          // nullify the registered gpio from our allInstancesUsedGpios array as count is 0 and it is being unexported
-          PCF857x._allInstancesUsedGpios[this._gpioPin] = null;
+        if (this._gpioPin !== null) {
+          // delete the registered gpio from our allInstancesUsedGpios object as reference count is 0 and gpio is being unexported
+          delete PCF857x._allInstancesUsedGpios[this._gpioPin];
         }
         this._gpio.unexport();
       }
-      this._gpioPin = -1;
+      this._gpioPin = null;
       this._gpio = null;
     }
   }
