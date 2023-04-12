@@ -54,6 +54,7 @@ const PCF8574 = require('pcf8574').PCF8574;
 const i2cBus = require('i2c-bus').openSync(1);
 
 // Define the address of the PCF8574/PCF8574A/PCF8575
+// Default addresses: PCF8574A - 0x38; PCF8574/PCF8575 - 0x20;
 const addr = 0x38;
 
 // Init a new PCF8574 with all pins high by default
@@ -181,7 +182,7 @@ enableInterrupt (gpioPin: number): void;
 Enable the interrupt detection on the specified GPIO pin.
 You can use one GPIO pin for multiple instances of the PCF8574 class.
 
-* `gpioPin` - BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A IC.
+* `gpioPin` - BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A/PCF8575 IC.
 
 
 ### disableInterrupt()
@@ -196,7 +197,7 @@ This will unexport the interrupt GPIO, if it is not used by an other instance of
 ```ts
 doPoll (): Promise<void>;
 ```
-Manually poll changed inputs from the PCF8574/PCF8574A IC.
+Manually poll changed inputs from the PCF8574/PCF8574A/PCF8575 IC.
 
 If a change on an input is detected, an `input` Event will be emitted with a data object containing the `pin` and the new `value`.
 This have to be called frequently enough if you don't use a GPIO for interrupt detection.

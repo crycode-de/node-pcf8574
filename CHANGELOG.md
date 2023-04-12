@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.1.0 2023-04-08
+
+- Fix issues if enableInterrupt() invoked multiple times with same or different gpio pin number. (thanks to Lyndel McGee [#55](https://github.com/crycode-de/node-pcf8574/issues/55))
+
 ## v3.0.1 2023-03-21
 
 - Added support for PCF8575 ICs with 16 pins (thanks to Lyndel McGee [#52](https://github.com/crycode-de/node-pcf8574/issues/52))

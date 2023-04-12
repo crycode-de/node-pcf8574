@@ -123,6 +123,9 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
   /** Flag if we are currently polling changes from the PCF857x IC. */
   private _currentlyPolling: boolean = false;
 
+  /** Pin number of GPIO to detect interrupts, or null by default. */
+  private _gpioPin: number | null = null;
+
   /** Instance of the used GPIO to detect interrupts, or null if no interrupt is used. */
   private _gpio: Gpio = null;
 
@@ -195,6 +198,10 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A/PCF8575 IC.
    */
   public enableInterrupt (gpioPin: number): void {
+    if (this._gpio !== null) {
+      throw new Error('GPIO interrupt already enabled.');
+    }
+
     if (PCF857x._allInstancesUsedGpios[gpioPin]) {
       // use already initialized GPIO
       this._gpio = PCF857x._allInstancesUsedGpios[gpioPin];
@@ -206,6 +213,8 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
       this._gpio['pcf857xUseCount'] = 1;
       PCF857x._allInstancesUsedGpios[gpioPin] = this._gpio;
     }
+    // cache this value so we can properly nullify entry in static_allInstancesUsedGpios object during disableInterrupt calls.
+    this._gpioPin = gpioPin;
     this._gpio.watch(this._handleInterrupt);
   }
 
@@ -230,9 +239,13 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
       // decrease the use count of the GPIO and unexport it if not used anymore
       this._gpio['pcf857xUseCount']--;
       if (this._gpio['pcf857xUseCount'] === 0) {
+        if (this._gpioPin !== null) {
+          // delete the registered gpio from our allInstancesUsedGpios object as reference count is 0 and gpio is being unexported
+          delete PCF857x._allInstancesUsedGpios[this._gpioPin];
+        }
         this._gpio.unexport();
       }
-
+      this._gpioPin = null;
       this._gpio = null;
     }
   }
