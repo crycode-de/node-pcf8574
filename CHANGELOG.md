@@ -1,8 +1,9 @@
 # Changelog
 
-## v3.1.0 2023-04-08
+## v3.1.0 2023-04-12
 
-- Fix issues if enableInterrupt() invoked multiple times with same or different gpio pin number. (thanks to Lyndel McGee [#55](https://github.com/crycode-de/node-pcf8574/issues/55))
+- Fix issues if enableInterrupt() invoked multiple times with same or different gpio pin number. (thanks to Lyndel McGee [#55](https://github.com/crycode-de/node-pcf8574/issues/55), [#56](https://github.com/crycode-de/node-pcf8574/pull/56))  
+  💥 This may be a breaking change if you called `enabledInterrupt()` multiple times without calling `disableInterrupt()` first - wich was never intended!
 
 ## v3.0.1 2023-03-21
 

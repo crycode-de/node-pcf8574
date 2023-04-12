@@ -196,6 +196,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * Enable the interrupt detection on the specified GPIO pin.
    * You can use one GPIO pin for multiple instances of the PCF857x class.
    * @param {number} gpioPin BCM number of the pin, which will be used for the interrupts from the PCF8574/8574A/PCF8575 IC.
+   * @throws Error if interrupt is already enabled.
    */
   public enableInterrupt (gpioPin: number): void {
     if (this._gpio !== null) {
