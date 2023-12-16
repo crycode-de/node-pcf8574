@@ -223,8 +223,12 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * Internal function to handle a GPIO interrupt.
    */
   private _handleInterrupt (): void {
+    const self = this;
     // poll the current state and ignore any rejected promise
-    this._poll().catch(() => { /* nothing to do here */ });
+    self._poll().then(() => {
+        // poll a 2nd time a short time later in case interrupt did not report all changes.
+        setTimeout(() => {self._poll().catch(()=>{ /* nothing to do here */ })}, 50);
+    }).catch(()=>{ /* nothing to do here */ });
   }
 
   /**
