@@ -231,7 +231,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
       setTimeout(() => {
         this._poll().catch(() => {
           setTimeout(() => {
-            this._poll().catch(() => { })
+            this._poll().catch(() => { /* nothing to do here */ })
           }, pollDelay * 10)
         })
       }, pollDelay)
