@@ -223,8 +223,19 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * Internal function to handle a GPIO interrupt.
    */
   private _handleInterrupt (): void {
-    // poll the current state and ignore any rejected promise
-    this._poll().catch(() => { /* nothing to do here */ });
+    // Multiple interrupts can occur when reading i2c bus asynchronously and hence we can get poll already active errors.
+    // If an interrupt is not serviced with a chip read, then the interrupt may never fire again.
+    // To prevent this, poll the current state and if error, poll 2 more times using timeouts after 25ms and then after 250ms.
+    const pollDelay: number = 25
+    this._poll().catch(() => {
+      setTimeout(() => {
+        this._poll().catch(() => {
+          setTimeout(() => {
+            this._poll().catch(() => { })
+          }, pollDelay * 10)
+        })
+      }, pollDelay)
+    })
   }
 
   /**
