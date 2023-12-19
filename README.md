@@ -201,7 +201,15 @@ Manually poll changed inputs from the PCF8574/PCF8574A/PCF8575 IC.
 
 If a change on an input is detected, an `input` Event will be emitted with a data object containing the `pin` and the new `value`.
 This have to be called frequently enough if you don't use a GPIO for interrupt detection.
-If you poll again before the last poll was completed, the promise will be rejected with an error.
+If you poll again before the last poll was completed, the new poll will be queued up an get executed if the current poll is done.
+
+
+### isPolling()
+```ts
+isPolling (): boolean;
+```
+Get the current polling state.
+Returns `true` if currently a poll is active or `false` if no poll is active.
 
 
 ### outputPin(pin, inverted, initialValue)
@@ -268,5 +276,5 @@ To get the current value call doPoll() first, if you're not using interrupts.
 
 Licensed under GPL Version 2
 
-Copyright (c) 2017-2023 Peter Müller <peter@crycode.de> (<https://crycode.de/>)  
+Copyright (c) 2017-2023 Peter Müller <peter@crycode.de> (<https://crycode.de/>)
 2022 - PCF8575 support inspired by Lyndel McGee <lynniemagoo@yahoo.com>
