@@ -11,6 +11,7 @@ import { I2CBus } from 'i2c-bus';
 import { Gpio } from 'onoff';
 import { PCF8574 } from './pcf8574';
 import { PCF8575 } from './pcf8575';
+import { PromiseQueue } from './promise-queue';
 
 /**
  * Enum of the known IC types.
@@ -123,6 +124,9 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
   /** Flag if we are currently polling changes from the PCF857x IC. */
   private _currentlyPolling: boolean = false;
 
+  /** PromiseQueue to handle requested polls in order. */
+  private _pollQueue: PromiseQueue = new PromiseQueue();
+
   /** Pin number of GPIO to detect interrupts, or null by default. */
   private _gpioPin: number | null = null;
 
@@ -223,8 +227,8 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * Internal function to handle a GPIO interrupt.
    */
   private _handleInterrupt (): void {
-    // poll the current state and ignore any rejected promise
-    this._poll().catch(() => { /* nothing to do here */ });
+    // enqueue a poll of current state and ignore any rejected promise
+    this._pollQueue.enqueue(() => this._poll()).catch(() => { /* nothing to do here */ });
   }
 
   /**
@@ -310,11 +314,11 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * Manually poll changed inputs from the PCF857x IC.
    * If a change on an input is detected, an "input" Event will be emitted with a data object containing the "pin" and the new "value".
    * This have to be called frequently enough if you don't use a GPIO for interrupt detection.
-   * If you poll again before the last poll was completed, the promise will be rejected with an error.
+   * If you poll again before the last poll was completed, the new poll will be queued up the be executed after the current poll.
    * @return {Promise}
    */
   public doPoll (): Promise<void> {
-    return this._poll();
+    return this._pollQueue.enqueue(() => this._poll());
   }
 
   /**
@@ -392,6 +396,14 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
   }
 
   /**
+   * Returns if one or multiple polls are currently queued for execution.
+   * @returns `true` if we are currently polling.
+   */
+  public isPolling (): boolean {
+    return !this._pollQueue.isEmpty();
+  }
+
+  /**
    * Define a pin as an output.
    * This marks the pin to be used as an output pin.
    * @param  {PinNumber} pin                  The pin number. (0 to 7 for PCF8574/PCF8574A, 0 to 15 for PCF8575)
@@ -440,7 +452,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
     return this._setNewState()
       // ... and then poll all current inputs with noEmit on this pin to suppress the event
       .then(() => {
-        return this._poll(pin);
+        return this._pollQueue.enqueue(() => this._poll(pin));
       });
   }
 
