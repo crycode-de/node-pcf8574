@@ -125,7 +125,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
   private _currentlyPolling: boolean = false;
 
   /** PromiseQueue to handle requested polls in order. */
-  private _pollQueue: PromiseQueue = new PromiseQueue();
+  private _pollQueue: PromiseQueue = new PromiseQueue(1);
 
   /** Pin number of GPIO to detect interrupts, or null by default. */
   private _gpioPin: number | null = null;
@@ -315,6 +315,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * If a change on an input is detected, an "input" Event will be emitted with a data object containing the "pin" and the new "value".
    * This have to be called frequently enough if you don't use a GPIO for interrupt detection.
    * If you poll again before the last poll was completed, the new poll will be queued up the be executed after the current poll.
+   * If you poll again while also a poll is queued, this will be rejected.
    * @return {Promise}
    */
   public doPoll (): Promise<void> {

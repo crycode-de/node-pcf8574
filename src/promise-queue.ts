@@ -25,13 +25,35 @@ export class PromiseQueue {
   private working: boolean = false;
 
   /**
+   * The maximum length of the queue.
+   */
+  private maxQueueLength: number | undefined = undefined;
+
+  /**
+   * Create a Promise Queue.
+   * @param maxQueueLength Optional maximum allowed length of the queue.
+   */
+  constructor (maxQueueLength?: number) {
+    if (typeof maxQueueLength === 'number') {
+      this.maxQueueLength = maxQueueLength;
+    }
+  }
+
+  /**
    * Enqueue a Promise.
    * This adds the given Promise to the queue. If the queue was empty the Promise
    * will be started immediately.
+   * If the PromiseQueue was initialized with a maximum length and the Promise to
+   * enqueue would exceed the limit, a Promise rejection will be returned instant.
    * @param promise Function which returns the Promise.
-   * @returns A Promise which will be resolves (or rejected) if the queued promise is done.
+   * @returns A Promise which will be resolved (or rejected) if the queued promise is done. Or an instant Promise rejection if the maximum allowed queue length is exceeded.
    */
   public enqueue<T = void> (promise: () => Promise<T>): Promise<T> {
+    // check the maximum queue length
+    if (this.maxQueueLength !== undefined && this.queue.length >= this.maxQueueLength) {
+      return Promise.reject('Maximum queue length exceeded');
+    }
+
     return new Promise((resolve, reject) => {
       this.queue.push({
         promise,
