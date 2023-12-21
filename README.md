@@ -200,8 +200,12 @@ doPoll (): Promise<void>;
 Manually poll changed inputs from the PCF8574/PCF8574A/PCF8575 IC.
 
 If a change on an input is detected, an `input` Event will be emitted with a data object containing the `pin` and the new `value`.
+
 This have to be called frequently enough if you don't use a GPIO for interrupt detection.
-If you poll again before the last poll was completed, the new poll will be queued up an get executed if the current poll is done.
+
+Poll requests will be queued internally up to 4 total requests (one active and three waiting) including polls triggered by interrupts.  
+If you try to trigger a poll while the queue is already full, the new poll will be rejected.  
+This is due to not have too many unnecessary polls.
 
 
 ### isPolling()

@@ -125,7 +125,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
   private _currentlyPolling: boolean = false;
 
   /** PromiseQueue to handle requested polls in order. */
-  private _pollQueue: PromiseQueue = new PromiseQueue(1);
+  private _pollQueue: PromiseQueue = new PromiseQueue(3);
 
   /** Pin number of GPIO to detect interrupts, or null by default. */
   private _gpioPin: number | null = null;
