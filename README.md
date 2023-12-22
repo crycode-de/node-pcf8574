@@ -133,10 +133,11 @@ process.on('SIGINT', () => {
 The API uses __Events__ for detected input changes and __Promises__ for all asyncronous actions.
 
 Input changes can be detected in two ways:
-* Using a GPIO to observe the interrupt signal from the PCF8574/PCF8574A/PCF8575 IC. *Recommended on Raspberry Pi or similar.*
+* Using a GPIO to observe the interrupt signal from the PCF8574/PCF8574A/PCF8575 IC. *Recommended on Raspberry Pi or similar.*  
+  When using interrupts an `interrupt` event event will be emitted each time an interrupt is detected.
 * Call `doPoll()` manually frequently enough to actively read the current states. This leads to a higher load on the I2C-Bus.
 
-If a pin is defined as an input and a changed state is detected, an `input` Event will be emitted with an object containing the `pin` number and the new `value` of this pin.
+If a pin is defined as an input and a changed state is detected, an `input` event will be emitted with an object containing the `pin` number and the new `value` of this pin.
 
 You can set an inverted flag for each pin separately, which will result in an inverted input or output.
 If an inverted input has a low level it will be interpreted as true and a high level will be false.

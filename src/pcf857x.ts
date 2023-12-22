@@ -64,20 +64,32 @@ export namespace PCF857x {
 /**
  * Interface for events of PCF8574
  */
-export interface IPCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinNumber> {
+export interface PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinNumber> {
   /**
    * Emit an input event.
    * @param event 'input'
    * @param data Object containing the pin number and the value.
    */
-  emit: (event: 'input', data: PCF857x.InputData<PinNumber>) => boolean;
+  emit (event: 'input', data: PCF857x.InputData<PinNumber>): boolean;
 
   /**
    * Emitted when an input pin has changed.
    * @param event 'input'
    * @param listener Eventlistener with an object containing the pin number and the value as first argument.
+  */
+  on (event: 'input', listener: (data: PCF8574.InputData) => void): this;
+
+  /**
+   * Emit an interrupt event from the GPIO.
+   * @param event 'interrupt'
    */
-  on: (event: 'input', listener: (data: PCF8574.InputData) => void) => this;
+  emit (event: 'interrupt'): boolean;
+
+  /**
+   * Emitted when an interrupt of the used gpio is triggered.
+   * @param event 'interrupt'
+   */
+  on (event: 'interrupt', listener: () => void): this;
 }
 
 /**
@@ -85,7 +97,7 @@ export interface IPCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinNumbe
  * This class shares common code for both types and has to be extend by a class
  * for the specific type.
  */
-export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinNumber> extends EventEmitter implements IPCF857x<PinNumber> {
+export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinNumber> extends EventEmitter {
 
   /** Constant for undefined pin direction (unused pin). */
   public static readonly DIR_UNDEF = -1;
@@ -232,6 +244,9 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
   private _handleInterrupt (): void {
     // enqueue a poll of current state and ignore any rejected promise
     this._pollQueue.enqueue(() => this._poll()).catch(() => { /* nothing to do here */ });
+
+    // emit interrupt event
+    this.emit('interrupt');
   }
 
   /**
