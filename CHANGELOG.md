@@ -5,6 +5,7 @@
 - Queue up multiple requested polls instead of rejecting them if an other poll is currently active
   💥 This may be a breaking change if you rely on the rejection to prevent multiple polls
 - Added method `isPolling()` to get the current polling state
+- Promise rejections now correctly use error objects
 
 ## v3.1.0 2023-04-12
 

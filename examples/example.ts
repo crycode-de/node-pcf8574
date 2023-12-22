@@ -1,20 +1,21 @@
 /*
- * Node.js PCF8574/PCF8574A
- *
- * Copyright (c) 2017-2023 Peter Müller <peter@crycode.de> (https://crycode.de)
- *               2022 - PCF8575 support inspired by Lyndel McGee <lynniemagoo@yahoo.com>
- *
- * Node.js module for controlling each pin of a PCF8574/PCF8574A I2C port expander IC.
- *
- * This example is showing you how to setup and use inputs and outputs.
- */
+* Node.js PCF8574/PCF8574A
+*
+* Copyright (c) 2017-2023 Peter Müller <peter@crycode.de> (https://crycode.de)
+*               2022 - PCF8575 support inspired by Lyndel McGee <lynniemagoo@yahoo.com>
+*
+* Node.js module for controlling each pin of a PCF8574/PCF8574A I2C port expander IC.
+*
+* This example is showing you how to setup and use inputs and outputs.
+*/
+/* eslint-disable no-console */
 
 // Import the PCF8574 class from the pcf8574 module
-//import { PCF8574 } from 'pcf8574';
+// import { PCF8574 } from 'pcf8574';
 import { PCF8574 } from '../';
 
 // Import the i2c-bus module and open the bus
-import {I2CBus, openSync as I2CBusOpenSync} from 'i2c-bus';
+import { I2CBus, openSync as I2CBusOpenSync } from 'i2c-bus';
 const i2cBus: I2CBus = I2CBusOpenSync(1);
 
 // Define the address of the PCF8574/PCF8574A
@@ -74,7 +75,7 @@ pcf.on('input', (data: PCF8574.InputData) => {
   console.log('input', data);
 
   // Check if a button attached to pin 7 is pressed (signal goes low)
-  if(data.pin === 7 && data.value === false){
+  if (data.pin === 7 && data.value === false) {
     // Toggle pin 1
     pcf.setPin(1);
   }

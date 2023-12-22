@@ -16,13 +16,15 @@ import { PromiseQueue } from './promise-queue';
 /**
  * Enum of the known IC types.
  */
+/* eslint-disable @typescript-eslint/no-shadow */
 export enum PCF857x_TYPE {
   /** PCF8574/PCF8574A with 8 pins */
   PCF8574,
 
   /** PCF8575 IC with 16 pins */
-  PCF8575
+  PCF8575,
 }
+/* eslint-enable @typescript-eslint/no-shadow */
 
 /**
  * Namespace for the common class PCF857x.
@@ -56,26 +58,26 @@ export namespace PCF857x {
      * @type {boolean}
      */
     value: boolean;
-  }
+  };
 }
 
 /**
  * Interface for events of PCF8574
  */
-export interface PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinNumber> {
+export interface IPCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinNumber> {
   /**
    * Emit an input event.
    * @param event 'input'
    * @param data Object containing the pin number and the value.
    */
-  emit (event: 'input', data: PCF857x.InputData<PinNumber>): boolean;
+  emit: (event: 'input', data: PCF857x.InputData<PinNumber>) => boolean;
 
   /**
    * Emitted when an input pin has changed.
    * @param event 'input'
    * @param listener Eventlistener with an object containing the pin number and the value as first argument.
    */
-  on (event: 'input', listener: (data: PCF8574.InputData) => void): this;
+  on: (event: 'input', listener: (data: PCF8574.InputData) => void) => this;
 }
 
 /**
@@ -83,7 +85,7 @@ export interface PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinNumber
  * This class shares common code for both types and has to be extend by a class
  * for the specific type.
  */
-export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinNumber> extends EventEmitter {
+export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinNumber> extends EventEmitter implements IPCF857x<PinNumber> {
 
   /** Constant for undefined pin direction (unused pin). */
   public static readonly DIR_UNDEF = -1;
@@ -131,7 +133,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
   private _gpioPin: number | null = null;
 
   /** Instance of the used GPIO to detect interrupts, or null if no interrupt is used. */
-  private _gpio: Gpio = null;
+  private _gpio: Gpio | null = null;
 
   /**
    * Constructor for a new PCF857x instance.
@@ -147,6 +149,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
     super();
 
     // bind the _handleInterrupt method strictly to this instance
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     this._handleInterrupt = this._handleInterrupt.bind(this);
 
     this._i2cBus = i2cBus;
@@ -171,7 +174,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
     this._address = address;
 
     // set pin directions to undefined
-    this._directions = new Array(this._pins).fill(PCF857x.DIR_UNDEF);
+    this._directions = new Array<PCF857x.PinDirection>(this._pins).fill(PCF857x.DIR_UNDEF);
 
     // nothing inverted by default
     this._inverted = 0;
@@ -188,10 +191,10 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
     this._currentState = initialState;
     switch (this._type) {
       case PCF857x_TYPE.PCF8574:
-        this._i2cBus.i2cWriteSync(this._address, 1, Buffer.from([this._currentState & 0xFF]));
+        this._i2cBus.i2cWriteSync(this._address, 1, Buffer.from([ this._currentState & 0xFF ]));
         break;
       case PCF857x_TYPE.PCF8575:
-        this._i2cBus.i2cWriteSync(this._address, 2, Buffer.from([this._currentState & 0xFF, (this._currentState >>> 8) & 0xFF]));
+        this._i2cBus.i2cWriteSync(this._address, 2, Buffer.from([ this._currentState & 0xFF, (this._currentState >>> 8) & 0xFF ]));
         break;
     }
   }
@@ -265,10 +268,10 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
   private _setStatePin (current: number, pin: PinNumber, value: boolean): number {
     if (value) {
       // set the bit
-      return current | 1 << (pin as number);
+      return current | (1 << pin);
     } else {
       // clear the bit
-      return current & ~(1 << (pin as number));
+      return current & ~(1 << pin);
     }
   }
 
@@ -277,7 +280,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * @param  {number}  newState (optional) The new state which will be set. If omitted the current state will be used.
    * @return {Promise}          Promise which gets resolved when the state is written to the IC, or rejected in case of an error.
    */
-  private _setNewState (newState?: number): Promise<void> {
+  private async _setNewState (newState?: number): Promise<void> {
     return new Promise((resolve: () => void, reject: (err: Error) => void) => {
 
       if (typeof (newState) === 'number') {
@@ -302,10 +305,11 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
       // send
       switch (this._type) {
         case PCF857x_TYPE.PCF8574:
-          this._i2cBus.i2cWrite(this._address, 1, Buffer.from([newIcState & 0xFF]), cb);
+          this._i2cBus.i2cWrite(this._address, 1, Buffer.from([ newIcState & 0xFF ]), cb);
           break;
         case PCF857x_TYPE.PCF8575:
-          this._i2cBus.i2cWrite(this._address, 2, Buffer.from([newIcState & 0xFF, (newIcState >>> 8) & 0xFF]), cb);
+          this._i2cBus.i2cWrite(this._address, 2, Buffer.from([ newIcState & 0xFF, (newIcState >>> 8) & 0xFF ]), cb);
+          break;
       }
     });
   }
@@ -318,7 +322,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * If you poll again while also a poll is queued, this will be rejected.
    * @return {Promise}
    */
-  public doPoll (): Promise<void> {
+  public async doPoll (): Promise<void> {
     return this._pollQueue.enqueue(() => this._poll());
   }
 
@@ -330,9 +334,9 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * @param {PinNumber} noEmit (optional) Pin number of a pin which should not trigger an event. (used for getting the current state while defining a pin as input)
    * @return {Promise}
    */
-  private _poll (noEmit?: PinNumber): Promise<void> {
+  private async _poll (noEmit?: PinNumber): Promise<void> {
     if (this._currentlyPolling) {
-      return Promise.reject('An other poll is in progress');
+      return Promise.reject(new Error('An other poll is in progress'));
     }
 
     this._currentlyPolling = true;
@@ -353,13 +357,13 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
             const value: boolean = ((readState >> pin) % 2 !== 0);
             this._currentState = this._setStatePin(this._currentState, pin as PinNumber, value);
             if (noEmit !== pin) {
-              this.emit('input', <PCF857x.InputData<PinNumber>>{ pin: pin, value: value });
+              this.emit('input', ({ pin: pin, value: value } as PCF857x.InputData<PinNumber>));
             }
           }
         }
 
         resolve();
-      }
+      };
 
       // read from the IC - type specific
       switch (this._type) {
@@ -387,7 +391,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
             }
 
             // Readstate is 16 bit reverse of byte ordering.  Pins 0-7 are in byte 0.  Pins 8-15 are in byte 1.
-            const readState = buffer[0] | buffer[1] << 8;
+            const readState = buffer[0] | (buffer[1] << 8);
 
             processRead(readState);
           });
@@ -412,7 +416,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * @param  {boolean}           initialValue (optional) The initial value of this pin, which will be set immediately.
    * @return {Promise}
    */
-  public outputPin (pin: PinNumber, inverted: boolean, initialValue?: boolean): Promise<void> {
+  public async outputPin (pin: PinNumber, inverted: boolean, initialValue?: boolean): Promise<void> {
     if (pin < 0 || pin > (this._pins - 1)) {
       return Promise.reject(new Error('Pin out of range'));
     }
@@ -421,11 +425,11 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
 
     this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, false);
 
-    this._directions[pin as number] = PCF857x.DIR_OUT;
+    this._directions[pin] = PCF857x.DIR_OUT;
 
     // set the initial value only if it is defined, otherwise keep the last value (probably from the initial state)
     if (typeof (initialValue) === 'undefined') {
-      return Promise.resolve(null);
+      return Promise.resolve();
     } else {
       return this._setPinInternal(pin, initialValue);
     }
@@ -438,7 +442,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * @param  {boolean}           inverted true if this pin should be handled inverted (high=false, low=true)
    * @return {Promise}
    */
-  public inputPin (pin: PinNumber, inverted: boolean): Promise<void> {
+  public async inputPin (pin: PinNumber, inverted: boolean): Promise<void> {
     if (pin < 0 || pin > (this._pins - 1)) {
       return Promise.reject(new Error('Pin out of range'));
     }
@@ -447,14 +451,12 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
 
     this._inputPinBitmask = this._setStatePin(this._inputPinBitmask, pin, true);
 
-    this._directions[pin as number] = PCF857x.DIR_IN;
+    this._directions[pin] = PCF857x.DIR_IN;
 
     // call _setNewState() to activate the high level on the input pin ...
-    return this._setNewState()
-      // ... and then poll all current inputs with noEmit on this pin to suppress the event
-      .then(() => {
-        return this._pollQueue.enqueue(() => this._poll(pin));
-      });
+    await this._setNewState();
+    // ... and then poll all current inputs with noEmit on this pin to suppress the event
+    return this._pollQueue.enqueue(() => this._poll(pin));
   }
 
   /**
@@ -464,18 +466,18 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * @param  {boolean}   value The new value for this pin.
    * @return {Promise}
    */
-  public setPin (pin: PinNumber, value?: boolean): Promise<void> {
+  public async setPin (pin: PinNumber, value?: boolean): Promise<void> {
     if (pin < 0 || pin > (this._pins - 1)) {
       return Promise.reject(new Error('Pin out of range'));
     }
 
-    if (this._directions[pin as number] !== PCF857x.DIR_OUT) {
+    if (this._directions[pin] !== PCF857x.DIR_OUT) {
       return Promise.reject(new Error('Pin is not defined as output'));
     }
 
-    if (typeof (value) == 'undefined') {
+    if (typeof (value) === 'undefined') {
       // set value dependend on current state to toggle
-      value = !((this._currentState >> (pin as number)) % 2 !== 0)
+      value = !((this._currentState >> (pin)) % 2 !== 0);
     }
 
     return this._setPinInternal(pin, value);
@@ -487,7 +489,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * @param  {boolean}   value The new value.
    * @return {Promise}
    */
-  private _setPinInternal (pin: PinNumber, value: boolean): Promise<void> {
+  private async _setPinInternal (pin: PinNumber, value: boolean): Promise<void> {
     const newState: number = this._setStatePin(this._currentState, pin, value);
 
     return this._setNewState(newState);
@@ -498,7 +500,7 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
    * @param  {boolean} value The new value for all output pins.
    * @return {Promise}
    */
-  public setAllPins (value: boolean): Promise<void> {
+  public async setAllPins (value: boolean): Promise<void> {
     let newState: number = this._currentState;
 
     for (let pin = 0; pin < this._pins; pin++) {
@@ -522,6 +524,6 @@ export abstract class PCF857x<PinNumber extends PCF8574.PinNumber | PCF8575.PinN
     if (pin < 0 || pin > (this._pins - 1)) {
       return false;
     }
-    return ((this._currentState >> (pin as number)) % 2 !== 0)
+    return ((this._currentState >> pin) % 2 !== 0);
   }
 }

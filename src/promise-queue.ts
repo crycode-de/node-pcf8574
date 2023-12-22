@@ -1,10 +1,10 @@
 /**
  * Interface to describe a queued promise in a `PromiseQueue`.
  */
-interface QueuedPromise<T = any> {
+interface QueuedPromise<T = unknown> {
   promise: () => Promise<T>;
   resolve: (value: T) => void;
-  reject: (reason?: any) => void;
+  reject: (reason?: unknown) => void;
 }
 
 /**
@@ -48,10 +48,10 @@ export class PromiseQueue {
    * @param promise Function which returns the Promise.
    * @returns A Promise which will be resolved (or rejected) if the queued promise is done. Or an instant Promise rejection if the maximum allowed queue length is exceeded.
    */
-  public enqueue<T = void> (promise: () => Promise<T>): Promise<T> {
+  public async enqueue<T = void> (promise: () => Promise<T>): Promise<T> {
     // check the maximum queue length
     if (this.maxQueueLength !== undefined && this.queue.length >= this.maxQueueLength) {
-      return Promise.reject('Maximum queue length exceeded');
+      return Promise.reject(new Error('Maximum queue length exceeded'));
     }
 
     return new Promise((resolve, reject) => {
@@ -68,8 +68,8 @@ export class PromiseQueue {
    * Returns if the queue is empty and no more Promises are queued.
    * @returns `true` if a Promise is active.
    */
-  public isEmpty(): boolean {
-    return !this.working && this.queue.length == 0;
+  public isEmpty (): boolean {
+    return !this.working && this.queue.length === 0;
   }
 
   /**
@@ -98,7 +98,7 @@ export class PromiseQueue {
         })
         .finally(() => {
           this.working = false;
-          this.dequeue()
+          this.dequeue();
         });
 
     } catch (err) {

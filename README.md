@@ -18,7 +18,7 @@ For more information about the PCF8574/PCF8574A please consult the [datasheet fr
 The **PCF8575** is a 16 bit/pin port expander IC similar to the PCF8574.
 For more information about the PCF8575 please consult the [datasheet from Texas Instruments](https://www.ti.com/lit/ds/symlink/pcf8575.pdf).
 
-**Supported (tested) Node.js versions:** 10, 12, 14, 16, 18
+**Supported (tested) Node.js versions:** 10, 12, 14, 16, 18, 20
 
 ## Installation
 

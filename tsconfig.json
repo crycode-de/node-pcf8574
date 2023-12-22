@@ -5,6 +5,7 @@
     "target": "es2018",
     "noImplicitAny": false,
     "removeComments": false,
+    "strictNullChecks": true,
     "outDir": "dist"
   },
   "include": [
